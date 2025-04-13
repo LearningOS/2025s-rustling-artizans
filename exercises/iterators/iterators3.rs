@@ -9,7 +9,7 @@
 // Execute `rustlings hint iterators3` or use the `hint` watch subcommand for a
 // hint.
 
-// I AM NOT DONE
+
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum DivisionError {
@@ -26,23 +26,55 @@ pub struct NotDivisibleError {
 // Calculate `a` divided by `b` if `a` is evenly divisible by `b`.
 // Otherwise, return a suitable error.
 pub fn divide(a: i32, b: i32) -> Result<i32, DivisionError> {
-    todo!();
+    match b {
+        0 => Err(DivisionError::DivideByZero),
+        _ => {
+            if a % b == 0 {
+                Ok(a / b)
+            } else {
+                // todo!("a is not evenly divisible by b.");
+                Err(DivisionError::NotDivisible(NotDivisibleError 
+                    {
+                        dividend: a, 
+                        divisor: b
+                    })
+                )
+            }
+        }
+    }
 }
 
 // Complete the function and return a value of the correct type so the test
 // passes.
 // Desired output: Ok([1, 11, 1426, 3])
-fn result_with_list() -> () {
+fn result_with_list() ->  Result<Vec<i32>, DivisionError> {
     let numbers = vec![27, 297, 38502, 81];
-    let division_results = numbers.into_iter().map(|n| divide(n, 27));
+    // let division_results:Result<Vec<i32>, String> = numbers.into_iter().map(|n| divide(n, 27));
+    let mut vec = Vec::<i32>::new();
+    for n in numbers {
+        match divide(n, 27) {
+            Ok(r) => vec.push(r),
+            Err(e) => return Err(e),
+        }
+    }
+    Ok(vec)
 }
 
 // Complete the function and return a value of the correct type so the test
 // passes.
 // Desired output: [Ok(1), Ok(11), Ok(1426), Ok(3)]
-fn list_of_results() -> () {
+fn list_of_results() -> Vec<Result<i32, DivisionError>>{
     let numbers = vec![27, 297, 38502, 81];
-    let division_results = numbers.into_iter().map(|n| divide(n, 27));
+    // let division_results = numbers.into_iter().map(|n| divide(n, 27)).collect();
+    let mut vec = Vec::new();
+    for n in numbers {
+        match divide(n, 27) {
+            Ok(r) => vec.push(Ok(r)),
+            Err(e) => vec.push(Err(e)),
+
+        }
+    }
+    vec
 }
 
 #[cfg(test)]
@@ -76,11 +108,13 @@ mod tests {
     }
 
     #[test]
+    // Failed
     fn test_result_with_list() {
         assert_eq!(format!("{:?}", result_with_list()), "Ok([1, 11, 1426, 3])");
     }
 
     #[test]
+    // Failed
     fn test_list_of_results() {
         assert_eq!(
             format!("{:?}", list_of_results()),
